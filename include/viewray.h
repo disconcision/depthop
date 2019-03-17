@@ -9,11 +9,10 @@
 #include "Camera.h"
 #include "Image.h"
 
-void viewing_ray(
-  const Camera & camera,
-  const int i,
-  const int j,
-  Image image,
-  Ray & ray);
+Ray viewray(
+        const Camera &camera,
+        const int i,
+        const int j,
+        Image &image);
 
 #endif //RAYMARCHER_VIEWING_RAY_H

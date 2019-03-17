@@ -9,10 +9,11 @@
 #include "types.h"
 
 double march(
-        const Ray & ray,
+        const Ray& ray,
+        double (&f)(vec3),
         const double min_t,
         const double max_t,
-        int & hit_id,
+        int& hit_id,
         vec3& n);
 
 #endif //RAYMARCHER_MARCH_H

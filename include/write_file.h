@@ -10,7 +10,7 @@
 #include <string>
 
 bool write_file(
-        const std::string &filename,
-        Image image);
+        const std::string& filename,
+        Image& image);
 
 #endif //RAYMARCHER_WRITE_FILE_H

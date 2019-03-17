@@ -9,8 +9,8 @@
 
 struct Image {
     std::vector<unsigned char> data;
-    int num_channels = 3;
-    int width, height; // image size
+    unsigned num_channels = 3;
+    unsigned width, height; // image size
 };
 
 #endif //RAYMARCHER_IMAGE_H
