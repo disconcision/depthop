@@ -2,7 +2,7 @@
 // Created by disconcision on 16/03/19.
 //
 
-#include "lightray.h"
+#include "shade.h"
 //#include <algorithm>
 
 vec3 cMult(vec3 a, vec3 b) {
@@ -63,10 +63,10 @@ Color shade_blinn_phong(
 
 
 //lightray(ray, hit_id, n, depth);
-Color lightray(
-        const Ray& ray,
+Color shade(
+        const Ray &ray,
         const int hit_id,
-        const vec3& n,
+        const vec3 &n,
         const double depth) {
 
   Lights lights;

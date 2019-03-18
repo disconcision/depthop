@@ -2,7 +2,7 @@
 // Created by disconcision on 16/03/19.
 //
 
-#include "viewray.h"
+#include "screen.h"
 #include <iostream>
 
 /* transforms a single coordinate from screenspace to cameraspace */
@@ -10,9 +10,9 @@ double coordTransform(double i, double d_src, double d_target) {
     return (d_src * (i + 0.5)/d_target) - d_src/2;
 }
 
-Ray viewray(const Camera &camera,
-        const int i, const int j,
-        Image &image)
+Ray screen(const Camera &camera,
+           const int i, const int j,
+           Image &image)
 {
   // cameraspace direction of ray
   vec3 rayDirectionInCameraspace(

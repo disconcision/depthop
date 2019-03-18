@@ -5,5 +5,5 @@
 #include "sphereSDF.h"
 
 double sphere_sdf(const vec3 p) {
-  return p.norm() - 2.0;
+  return p.norm() - 1.0;
 }

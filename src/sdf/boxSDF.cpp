@@ -6,7 +6,9 @@
 #include "types.h"
 
 double box_sdf(const vec3 p) {
-  vec3 dist = p.cwiseAbs() - vec3(2,0.5,2); //size
-  double m = std::max(0.0, dist.norm());
-  return m + std::min(0.0, dist.maxCoeff());
+  // vector of distance along each dimension
+  vec3 dist = p.cwiseAbs() - vec3(0.25,0.5,3.0); //size
+  //double r = 1.0;
+  //double m = std::max(0.0, dist.norm());
+  return dist.maxCoeff(); // + std::min(0.0, dist.maxCoeff());
 }

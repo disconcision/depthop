@@ -11,8 +11,8 @@
 double march(
         const Ray& ray,
         double (&f)(vec3),
-        const double min_t,
-        const double max_t,
+        const double min_d,
+        const double max_d,
         int& hit_id,
         vec3& n);
 

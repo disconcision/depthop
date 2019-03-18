@@ -9,7 +9,7 @@
 #include "Camera.h"
 #include "Image.h"
 
-Ray viewray(
+Ray screen(
         const Camera &camera,
         const int i,
         const int j,

@@ -9,8 +9,8 @@
 #include <vector>
 #include <string>
 
-bool write_file(
-        const std::string& filename,
-        Image& image);
+bool write(
+        const std::string &filename,
+        Image &image);
 
 #endif //RAYMARCHER_WRITE_FILE_H
