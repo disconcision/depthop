@@ -34,12 +34,16 @@ double field(vec3 p) {
   SDF box = [] (const R3 x) {
       return (x.cwiseAbs() - R3(0.17,0.5,3.0)).maxCoeff();};
 
-  R4x4 transl, transl_inv;
+  R4x4 transl, transl_inv, transl_inv_bake;
   transl << 1.0, 0.0, 0.0, 0.5,
             0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0;
-  transl_inv = transl.inverse();
+  transl_inv_bake << 1.0, 0.0, 0.0, -0.5,
+          0.0, 1.0, 0.0, 0.0,
+          0.0, 0.0, 1.0, 0.0,
+          0.0, 0.0, 0.0, 1.0;
+  //transl_inv = transl.inverse();
   // todo: precalc this?
 
   /* transform :: (R4x4, SDF) -> SDF
@@ -100,7 +104,7 @@ double field(vec3 p) {
   //std::cout << typeid(a).name(); // whoa...
   //return (transform(transl_inv, a))(p);
   return smooth_join(transform(transl, scale(0.9, sphere)),
-                     transform(transl_inv, sphere), 20)(p);
+                     transform(transl_inv_bake, sphere), 20)(p);
   //return (blend(box, sphere, 0.2))(p);
   //return ((scale(1.5, sphere)))(p);
 }

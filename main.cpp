@@ -21,8 +21,8 @@
 #include <iostream>
 
 
-void set_pixel(Image &image, unsigned i, unsigned j, Color color) {
 
+void set_pixel(Image &image, unsigned i, unsigned j, Color color) {
   for (unsigned c=0; c < image.num_channels; c++) {
     image.data[c + image.num_channels*(j + i*image.width)]
       = (unsigned char) (255*color(c));
@@ -31,8 +31,7 @@ void set_pixel(Image &image, unsigned i, unsigned j, Color color) {
 
 
 bool intersect(
-        const Ray & ray, const double min_t, double & t, Eigen::Vector3d & n)
-{
+        const Ray & ray, const double min_t, double & t, Eigen::Vector3d & n){
 
   Eigen::Vector3d d = ray.direction;
   Eigen::Vector3d e = ray.origin;
@@ -68,6 +67,18 @@ bool intersect(
     return t >= min_t;
   }
 }
+/*
+double tt;
+vec3 nn;
+if (intersect(ray, 1.0, tt, nn)) {
+  //c = {0.8,0.3,0.2};
+  c[0] = (nn(0)*0.5+0.5);
+  c[1] = (nn(1)*0.5+0.5);
+  c[2] = (nn(2)*0.5+0.5);
+  set_pixel(image, i, j, c);
+}
+*/
+
 
 int main(int argc, char* argv[])
 {
@@ -84,41 +95,19 @@ int main(int argc, char* argv[])
 
   // set up output image
   Image image;
-  image.width = 800;
-  image.height = 800;
+  image.width = 600;
+  image.height = 600;
   image.num_channels = 3;
   image.data = std::vector<unsigned char>(image.num_channels*image.width*image.height);
 
   for(unsigned i=0; i < image.height; ++i) {
     for(unsigned j=0; j < image.width; ++j) {
-
       // get a ray from camera eye through screen pixel (i,j)
       Ray ray = screen(camera, i, j, image);
-
-      int hit_id; // todo: id for materials
-      Color c = Color(0.0,0.0,0.0); // bkg color
-      vec3 n; // normal at hit
-
-      double min_d = 0.0, max_d = 100.0,
-             depth = march(ray, field, min_d, max_d, hit_id, n);
-
-      if(depth < max_d) {
-        c = shade(ray, hit_id, n, depth);
-      }
-
+      // march on the ray and find a color
+      Color c = march(ray, field, 0.0, 100.0);
+      // set that pixel
       set_pixel(image, i, j, c);
-
-      /*
-      double tt;
-      vec3 nn;
-      if (intersect(ray, 1.0, tt, nn)) {
-        //c = {0.8,0.3,0.2};
-        c[0] = (nn(0)*0.5+0.5);
-        c[1] = (nn(1)*0.5+0.5);
-        c[2] = (nn(2)*0.5+0.5);
-        set_pixel(image, i, j, c);
-      }
-      */
     }
   }
   write("scene.ppm", image);

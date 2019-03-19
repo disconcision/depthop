@@ -3,6 +3,7 @@
 //
 
 #include "march.h"
+#include "shade.h"
 
 #include <iostream>
 
@@ -17,17 +18,19 @@ vec3 normal(double (&sdf)(vec3), const vec3& p) {
 }
 
 
-double march(
+Color march(
         const Ray& ray,
         double (&sdf)(vec3),
         const double min_d,
-        const double max_d,
-        int& hit_id,
-        vec3& n) {
+        const double max_d) {
 
   double depth = min_d;
   unsigned MAX_STEPS = 60;
   double EPSILON = 1e-8;
+
+  int hit_id; // todo: id for materials
+  Color c = Color(0.0,0.0,0.0); // bkg color
+  vec3 n; // normal at hit
 
   for (unsigned i=0; i < MAX_STEPS; i++) {
     vec3 p = ray.origin + depth*ray.direction;
@@ -36,12 +39,12 @@ double march(
     //  << " sdf(p): " << d << "\np: " << p << "\n";
     if (d < EPSILON) {
       n = normal(sdf, p);
-      return depth;
+      return shade(ray, hit_id, n, depth);
     }
     depth += d;
     if (depth >= max_d) {
-      return max_d;
+      return c;
     }
   }
-  return max_d;
+  return c;
 }
