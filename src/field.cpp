@@ -40,16 +40,22 @@ double field(vec3 p) {
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0;
   transl_inv_bake << 1.0, 0.0, 0.0, -0.5,
-          0.0, 1.0, 0.0, 0.0,
-          0.0, 0.0, 1.0, 0.0,
-          0.0, 0.0, 0.0, 1.0;
+                     0.0, 1.0, 0.0, 0.0,
+                     0.0, 0.0, 1.0, 0.0,
+                     0.0, 0.0, 0.0, 1.0;
   //transl_inv = transl.inverse();
   // todo: precalc this?
 
-  /* transform :: (R4x4, SDF) -> SDF
+  /* move :: (R3, SDF) -> SDF
+   * translates SDF through displacement d */
+  auto move = [] (R3 d, SDF f) {
+      return [f, d] (R3 x) {
+          return f(x - d);};};
+
+  /* affine :: (R4x4, SDF) -> SDF
    * affine-transforms the SDF according to the
    * INVERSE of the provided transformation */
-  auto transform = [] (R4x4 T_inv, SDF f) {
+  auto affine = [] (R4x4 T_inv, SDF f) {
       return [f, T_inv] (R3 x) {
           R4 t = T_inv*R4(x(0),x(1),x(2),1);
           return f(R3(t(0),t(1),t(2)));};};
@@ -94,19 +100,22 @@ double field(vec3 p) {
 
   /* smooth_join :: (SDF, SDF, R) -> SDF
    * smoothly unions two sdfs. s is a smoothness parameter. */
-  auto smooth_join = [] (SDF f, SDF g, R s) {
+  auto smooth_join = [] (SDF f, SDF g, R s) -> SDF {
       return [f, g, s] (R3 x) {
           return -log2(exp2(-s*f(x)) + exp2(-s*g(x)))/s;};};
 
   // join is of type std::function<SDF(SDF, SDF)>
 
-  //auto a = scale(1.0, sphere);
-  //std::cout << typeid(a).name(); // whoa...
-  //return (transform(transl_inv, a))(p);
-  return smooth_join(transform(transl, scale(0.9, sphere)),
-                     transform(transl_inv_bake, sphere), 20)(p);
+  // expanded version takes about half the time:
+  //return -log2(exp2(-20*0.9*sphere((p-vec3(-0.5,0,0))/0.9)) + exp2(-20*(sphere(p-vec3(0.5,0,0)))))/20;
+
+  //return sphere(p);
+  //return scale(1.5, sphere)(p);
+  //return move(R3(-0.5,0,0), sphere)(p);
+  //return affine(transl, sphere)(p);
   //return (blend(box, sphere, 0.2))(p);
-  //return ((scale(1.5, sphere)))(p);
+  return smooth_join(move(R3(-0.5,0,0), scale(0.9, sphere)),
+                     move(R3(0.5,0,0), sphere), 20)(p);
 }
 
 

@@ -40,7 +40,7 @@ Color shade_blinn_phong(
     //auto materal = some_function[hit_id]->material;
     double alpha = 2000;
     Color ka = Color(20.0/256,50.0/256,20.0/256),
-          kd = Color(128.0/256,60.0/256,20.0/256),
+          kd = Color(200.0/256,160.0/256,20.0/256),
           ks = Color(100.0/256,100.0/256,100.0/256);
 
     // add ambient light contribution

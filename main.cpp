@@ -20,6 +20,7 @@
 #include <Eigen/Geometry>
 #include <iostream>
 
+#include <omp.h>
 
 
 void set_pixel(Image &image, unsigned i, unsigned j, Color color) {
@@ -100,8 +101,10 @@ int main(int argc, char* argv[])
   image.num_channels = 3;
   image.data = std::vector<unsigned char>(image.num_channels*image.width*image.height);
 
-  for(unsigned i=0; i < image.height; ++i) {
-    for(unsigned j=0; j < image.width; ++j) {
+  #pragma omp parallel num_threads(4)
+  #pragma omp for schedule(dynamic,1)
+  for (unsigned i = 0; i < image.height; ++i) {
+    for (unsigned j = 0; j < image.width; ++j) {
       // get a ray from camera eye through screen pixel (i,j)
       Ray ray = screen(camera, i, j, image);
       // march on the ray and find a color
@@ -110,5 +113,6 @@ int main(int argc, char* argv[])
       set_pixel(image, i, j, c);
     }
   }
+
   write("scene.ppm", image);
 }
