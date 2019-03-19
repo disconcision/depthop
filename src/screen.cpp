@@ -21,7 +21,7 @@ Ray screen(const Camera &camera,
           -camera.d);
 
   // camera to worldspace transformation matrix
-  Eigen::Matrix3d cameraToWorld(3,3);
+  mat3 cameraToWorld(3,3);
   cameraToWorld << camera.u, camera.v, camera.w;
 
   Ray ray;

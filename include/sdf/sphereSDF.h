@@ -5,7 +5,7 @@
 #ifndef RAYMARCHER_SPHERE_H
 #define RAYMARCHER_SPHERE_H
 
-#include "types.h"
+#include "Objects/types.h"
 
 double sphere_sdf(const vec3 p);
 

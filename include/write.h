@@ -5,7 +5,7 @@
 #ifndef RAYMARCHER_WRITE_FILE_H
 #define RAYMARCHER_WRITE_FILE_H
 
-#include "Image.h"
+#include "Objects/Image.h"
 #include <vector>
 #include <string>
 

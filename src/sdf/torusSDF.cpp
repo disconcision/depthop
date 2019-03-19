@@ -2,7 +2,7 @@
 // Created by disconcision on 16/03/19.
 //
 
-#include "torusSDF.h"
+#include "sdf/torusSDF.h"
 
 double torus_sdf(const vec3 p) {
   vec2 t = vec2(1, 1.5);

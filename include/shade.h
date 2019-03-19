@@ -5,10 +5,10 @@
 #ifndef RAYMARCHER_SHADE_H
 #define RAYMARCHER_SHADE_H
 
-#include "Ray.h"
-#include "Light.h"
-#include "types.h"
-#include "DirectionalLight.h"
+#include "Objects/Ray.h"
+#include "Objects/Light.h"
+#include "Objects/types.h"
+#include "Objects/DirectionalLight.h"
 #include <memory>
 
 using Lights =  std::vector< std::shared_ptr<Light>>;

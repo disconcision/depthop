@@ -5,7 +5,7 @@
 #ifndef RAYMARCHER_TORUSSDF_H
 #define RAYMARCHER_TORUSSDF_H
 
-#include "types.h"
+#include "Objects/types.h"
 
 double torus_sdf(const vec3 p);
 

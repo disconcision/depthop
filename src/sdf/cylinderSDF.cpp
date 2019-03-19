@@ -2,7 +2,7 @@
 // Created by disconcision on 16/03/19.
 //
 
-#include "cylinderSDF.h"
+#include "sdf/cylinderSDF.h"
 
 double cylinder_sdf(const vec3 p) {
   vec3 c = vec3(0.5, 0.3, 0.6);

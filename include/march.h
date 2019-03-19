@@ -5,8 +5,8 @@
 #ifndef RAYMARCHER_MARCH_H
 #define RAYMARCHER_MARCH_H
 
-#include "Ray.h"
-#include "types.h"
+#include "Objects/Ray.h"
+#include "Objects/types.h"
 
 double march(
         const Ray& ray,

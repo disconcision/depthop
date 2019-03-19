@@ -5,7 +5,7 @@
 #ifndef RAYMARCHER_BOXSDF_H
 #define RAYMARCHER_BOXSDF_H
 
-#include "types.h"
+#include "Objects/types.h"
 
 double box_sdf(const vec3 p);
 

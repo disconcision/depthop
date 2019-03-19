@@ -2,18 +2,20 @@
 // Created by disconcision on 16/03/19.
 //
 
-#include "Ray.h"
-#include "Camera.h"
-#include "Image.h"
+#include "Objects/Ray.h"
+#include "Objects/Camera.h"
+#include "Objects/Image.h"
+
 #include "screen.h"
-#include "shade.h"
+#include "field.h"
 #include "march.h"
+#include "shade.h"
 #include "write.h"
 
-#include "sphereSDF.h"
-#include "boxSDF.h"
-#include "torusSDF.h"
-#include "cylinderSDF.h"
+#include "sdf/sphereSDF.h"
+#include "sdf/boxSDF.h"
+#include "sdf/torusSDF.h"
+#include "sdf/cylinderSDF.h"
 
 #include <Eigen/Geometry>
 #include <iostream>
@@ -76,7 +78,7 @@ int main(int argc, char* argv[])
   camera.e = vec3(0,0,5);
   camera.v = vec3(0,1,0);
   camera.w = -vec3(0,0,-1);
-  camera.u = (camera.v.cross(camera.w)).normalized();
+  camera.u = camera.v.cross(camera.w);
   camera.width = 1.0;
   camera.height = 1.0;
 
@@ -87,44 +89,36 @@ int main(int argc, char* argv[])
   image.num_channels = 3;
   image.data = std::vector<unsigned char>(image.num_channels*image.width*image.height);
 
-  for(unsigned i=0; i<image.height; ++i) {
-    for(unsigned j=0; j<image.width; ++j) {
+  for(unsigned i=0; i < image.height; ++i) {
+    for(unsigned j=0; j < image.width; ++j) {
 
       // get a ray from camera eye through screen pixel (i,j)
       Ray ray = screen(camera, i, j, image);
 
-      double t;
-      int hit_id;
+      int hit_id; // todo: id for materials
       Color c = Color(0.0,0.0,0.0); // bkg color
-      vec3 n;
+      vec3 n; // normal at hit
 
-      //std::cout << "march: " << march(ray, 0.0, 100.0, hit_id, n) <<"\n";
-      double min_d = 0.0, max_d = 100.0;
-      double depth = march(ray, std::max(box_sdf, sphere_sdf), min_d, max_d, hit_id, n);
-
-      double tt;
-      vec3 nn;
-      if (intersect(ray, 1.0, tt, nn)) {
-        //c[0] = (nn(0)*0.5+0.5);
-        //c[1] = (nn(1)*0.5+0.5);
-        //c[2] = (nn(2)*0.5+0.5);
-        //set_pixel(image, i, j, c);
-      }
+      double min_d = 0.0, max_d = 100.0,
+             depth = march(ray, field, min_d, max_d, hit_id, n);
 
       if(depth < max_d) {
-
-        c[0] = (n(0)*0.5+0.5);
-        c[1] = (n(1)*0.5+0.5);
-        c[2] = (n(2)*0.5+0.5);
-        //c = {0.8,0.3,0.2};
-        //c = shade(ray, hit_id, n, depth);
+        c = shade(ray, hit_id, n, depth);
       }
 
       set_pixel(image, i, j, c);
 
-
-
-
+      /*
+      double tt;
+      vec3 nn;
+      if (intersect(ray, 1.0, tt, nn)) {
+        //c = {0.8,0.3,0.2};
+        c[0] = (nn(0)*0.5+0.5);
+        c[1] = (nn(1)*0.5+0.5);
+        c[2] = (nn(2)*0.5+0.5);
+        set_pixel(image, i, j, c);
+      }
+      */
     }
   }
   write("scene.ppm", image);

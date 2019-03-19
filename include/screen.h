@@ -5,9 +5,9 @@
 #ifndef RAYMARCHER_VIEWING_RAY_H
 #define RAYMARCHER_VIEWING_RAY_H
 
-#include "Ray.h"
-#include "Camera.h"
-#include "Image.h"
+#include "Objects/Ray.h"
+#include "Objects/Camera.h"
+#include "Objects/Image.h"
 
 Ray screen(
         const Camera &camera,

@@ -5,7 +5,7 @@
 #ifndef RAYMARCHER_CYLINDERSDF_H
 #define RAYMARCHER_CYLINDERSDF_H
 
-#include "types.h"
+#include "Objects/types.h"
 
 double cylinder_sdf(const vec3 p);
 

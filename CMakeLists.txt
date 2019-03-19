@@ -6,7 +6,7 @@ set(SHARED_ROOT "${CMAKE_CURRENT_LIST_DIR}")
 
 # Add your project files
 include_directories("include/")
-file(GLOB SRCFILES src/*.cpp src/sdf/*.cpp)
+file(GLOB SRCFILES src/*.cpp src/sdf/* src/Objects/*.cpp)
 list(APPEND SRCFILES main.cpp)
 
 # create executable
@@ -14,7 +14,7 @@ include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 elseif(COMPILER_SUPPORTS_CXX0X)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
