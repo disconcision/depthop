@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
   image.num_channels = 3;
   image.data = std::vector<unsigned char>(image.num_channels*image.width*image.height);
 
-  #pragma omp parallel num_threads(4)
+  #pragma omp parallel num_threads(6)
   #pragma omp for schedule(dynamic,1)
   for (unsigned i = 0; i < image.height; ++i) {
     for (unsigned j = 0; j < image.width; ++j) {
