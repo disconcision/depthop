@@ -18,12 +18,70 @@
 #include <omp.h>
 
 
-void set_pixel(Image &image, unsigned i, unsigned j, Color color) {
-  for (unsigned c=0; c < image.num_channels; c++) {
-    image.data[c + image.num_channels*(j + i*image.width)]
-      = (unsigned char) (255*color(c));
+int main(int argc, char* argv[])
+{
+
+  /* IMAGE PLANE */
+
+  unsigned width = (argc != 3) ?
+          400 : (unsigned) strtol(argv[1], nullptr,0);
+  unsigned height = (argc != 3) ?
+          400 : (unsigned) strtol(argv[2], nullptr,0);
+  Image image(width, height, 3);
+
+
+  /* CAMERA */
+
+  Camera camera;
+  camera.d = 1.0;
+  camera.e = R3(0,0,5);
+  camera.v = R3(0,1,0);
+  camera.w = -R3(0,0,-1);
+  camera.u = camera.v.cross(camera.w);
+  camera.width = 1.0;
+  camera.height = 1.0;
+
+
+  /* LIGHTS */
+
+  Lights lights;
+  std::shared_ptr<DirectionalLight> light0(new DirectionalLight());
+  light0->d = R3(-1,-1,-1);
+  light0->I = R3(0.8,0.8,0.8);
+  light0->castShadows = true;
+  lights.push_back(light0);
+  std::shared_ptr<DirectionalLight> light1(new DirectionalLight());
+  light1->d = R3(-0,1,0);
+  light1->I = R3(0.0,0.3,0.8);
+  light1->castShadows = false;
+  lights.push_back(light1);
+
+
+  /*
+   * for each pixel (i,j) in the image plane,
+   * take a ray from the camera through that pixel,
+   * and march along that ray, returning a depth and
+   * a normal and a hit id. color the pixel based on
+   * those values and set the pixel accordingly.
+   *
+   */
+  #pragma omp parallel num_threads(6)
+  #pragma omp for schedule(dynamic,1)
+  for (unsigned i = 0; i < image.height; ++i) {
+    for (unsigned j = 0; j < image.width; ++j) {
+      Ray ray = screen(camera, i, j, image);
+      unsigned hit;
+      R3 normal;
+      R depth = march(ray, field, 0.0, 200.0, normal, hit);
+      Color c = shade(ray, field, lights, hit, normal, depth);
+      image.set_pixel(i, j, c);
+    }
   }
+
+  write("scene.ppm", image);
 }
+
+
 
 /*
 bool intersect(
@@ -76,62 +134,3 @@ if (intersect(ray, 1.0, tt, nn)) {
   set_pixel(image, i, j, c);
 }
 */
-
-
-int main(int argc, char* argv[])
-{
-
-  // set up output image
-  Image image;
-  if (argc != 3) {
-    image.width = 400;
-    image.height = 400;
-  } else {
-    image.width = (unsigned) strtol(argv[1], nullptr,0);
-    image.height = (unsigned) strtol(argv[2], nullptr,0);
-  }
-  image.num_channels = 3;
-  image.data = std::vector<unsigned char>(image.num_channels*image.width*image.height);
-
-
-  // set up camera
-  Camera camera;
-  camera.d = 1.0;
-  camera.e = R3(0,0,5);
-  camera.v = R3(0,1,0);
-  camera.w = -R3(0,0,-1);
-  camera.u = camera.v.cross(camera.w);
-  camera.width = 1.0;
-  camera.height = 1.0;
-
-
-  // set up lights
-  Lights lights;
-  std::shared_ptr<DirectionalLight> light0(new DirectionalLight());
-  light0->d = R3(-1,-1,-1);
-  light0->I = R3(0.8,0.8,0.8);
-  light0->castShadows = true;
-  lights.push_back(light0);
-  std::shared_ptr<DirectionalLight> light1(new DirectionalLight());
-  light1->d = R3(-0,1,0);
-  light1->I = R3(0,0.3,0.8);
-  light1->castShadows = false;
-  lights.push_back(light1);
-
-
-  #pragma omp parallel num_threads(6)
-  #pragma omp for schedule(dynamic,1)
-  for (unsigned i = 0; i < image.height; ++i) {
-    for (unsigned j = 0; j < image.width; ++j) {
-      // get a ray from camera eye through screen pixel (i,j)
-      Ray ray = screen(camera, i, j, image);
-      unsigned hit;
-      R3 normal;
-      R depth = march(ray, field, 0.0, 200.0, normal, hit);
-      Color c = shade(ray, field, lights, hit, normal, depth);
-      set_pixel(image, i, j, c);
-    }
-  }
-
-  write("scene.ppm", image);
-}

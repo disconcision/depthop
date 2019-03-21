@@ -38,7 +38,7 @@ auto smooth_join (R s, SDF f, SDF g) -> SDF {
 
 
 /* todo */
-auto smooth_join_p (SDF f, SDF g, R k) -> SDF {
+auto smooth_join_p (R k, SDF f, SDF g) -> SDF {
   return [f, g, k] (R3 x) {
       R a = f(x), b = g(x);
       R h = clamp(0.5 + 0.5*(b - a)/k, 0, 1);
@@ -46,7 +46,7 @@ auto smooth_join_p (SDF f, SDF g, R k) -> SDF {
 
 
 /* todo */
-auto smooth_sub_p (SDF f, SDF g, R k) -> SDF {
+auto smooth_sub_p (R k, SDF f, SDF g) -> SDF {
   return [f, g, k] (R3 x) {
       R a = f(x), b = g(x);
       R h = clamp(0.5 - 0.5*(b + a)/k, 0, 1);

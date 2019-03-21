@@ -25,10 +25,10 @@ auto blend (R a, SDF f, SDF g) -> SDF;
 auto smooth_join (R s, SDF f, SDF g) -> SDF;
 
 /* todo */
-auto smooth_join_p (SDF f, SDF g, R k) -> SDF;
+auto smooth_join_p (R k, SDF f, SDF g) -> SDF;
 
 /* todo */
-auto smooth_sub_p (SDF f, SDF g, R k) -> SDF;
+auto smooth_sub_p (R k, SDF f, SDF g) -> SDF;
 
 
 #endif //RAYMARCHER_COMBINATOR_H

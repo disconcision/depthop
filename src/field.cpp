@@ -34,7 +34,7 @@ R field(R3 p) {
   auto f = move(R3(-0.1,0.5,0),rotate_y(-0.3,round(0.1, box)));
   auto butt = smooth_join(30, move(R3(-0.5,0,0), scale(0.9, sphere)),
                           move(R3(0.5,0,0), sphere));
-  auto g = rotate_z(0.4,smooth_sub_p(f, butt, 0.1));
+  auto g = rotate_z(0.4,smooth_sub_p(0.1, f, butt));
   auto final = join(scale(0.8,g),repeat(R3(1,2,3),scale(0.2,g)));
   //return final(p);
 
