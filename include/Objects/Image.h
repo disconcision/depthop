@@ -17,11 +17,11 @@ struct Image {
     unsigned num_channels = 3;
     unsigned width, height;
 
-    Image(unsigned w, unsigned h, unsigned n_c) {
-      this->num_channels = n_c;
+    Image(unsigned w, unsigned h) {
       this->width = w;
       this->height = h;
-      this->data = std::vector<unsigned char>(n_c*w*h);
+      this->num_channels = 3;
+      this->data = std::vector<unsigned char>(3*w*h);
     }
 
 

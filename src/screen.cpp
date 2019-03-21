@@ -11,9 +11,8 @@ R coordTransform(R x, R d_src, R d_target) {
   return (d_src * (x + 0.5)/d_target) - d_src/2;
 }
 
-Ray screen(const Camera &camera,
-           const unsigned i, const unsigned j,
-           Image &image) {
+Ray screen(const Camera &camera, const Image &image,
+           const unsigned i, const unsigned j) {
   /* returns a ray from the eye of the camera
    * through pixel (i,j) on the image screen */
 

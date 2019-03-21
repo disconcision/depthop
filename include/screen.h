@@ -13,11 +13,8 @@
 
 /* returns a ray from the eye of the camera
  * through pixel (i,j) on the image screen */
-Ray screen(
-        const Camera &camera,
-        const unsigned i,
-        const unsigned j,
-        Image &image);
+Ray screen(const Camera &camera, const Image &image,
+           const unsigned i, const unsigned j);
 
 
 #endif //RAYMARCHER_VIEWING_RAY_H

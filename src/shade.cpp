@@ -4,13 +4,13 @@
 
 #include "shade.h"
 #include "geometry.h"
-//#include <iostream>
+#include "constants.h"
+
 
 
 double soft_shadow(
         const Ray &ray,
         R (&sdf)(R3),
-        const R min_d,
         const R max_d) {
   /*
    * SDF SOFT SHADOWS
@@ -26,16 +26,13 @@ double soft_shadow(
    * REF: https://iquilezles.org/www/articles/rmshadows/rmshadows.htm
    *
    */
-  const unsigned MAX_STEPS = 160;
-  const R EPSILON = 1e-5;
-  const R softness = 4.0; // 1: very soft to 64: very hard
   R shadow_factor = 1.0; // initial value; falling
-  R depth = min_d;
+  R depth = MIN_D_SHADOW;
 
-  for (unsigned i=0; i < MAX_STEPS; i++) {
+  for (unsigned i=0; i < MAX_STEPS_SHADOW; i++) {
     R distance = sdf(follow(ray, depth));
-    if (distance < EPSILON) return 0.0;
-    shadow_factor = min(shadow_factor, softness*distance/depth);
+    if (distance < EPSILON_SHADOW) return 0.0;
+    shadow_factor = min(shadow_factor, SOFTNESS*distance/depth);
     depth += distance;
     if (depth >= max_d) break;
   }
@@ -63,14 +60,12 @@ double ambient_occlusion(
    * REF: http://9bitscience.blogspot.com/2013/07/
    *
    * */
-  const unsigned MAX_STEPS = 5;
-  const R step_size = 0.3;
   R occlusion_factor = 1.0;
   R depth = 1e-2;
 
-  for (unsigned i=1; i < MAX_STEPS; i++) {
+  for (unsigned i=1; i < MAX_STEPS_AO; i++) {
     R distance = sdf(follow(Ray(p,n), depth));
-    depth += step_size;
+    depth += STEP_SIZE_AO;
     occlusion_factor -= (depth - distance)/(i*i);//(pow(2,i));
   }
   return occlusion_factor;
@@ -121,10 +116,9 @@ Color shade_blinn_phong(
     // determine shadow factor
     Ray shadow_ray(point, light_direction);
     double light_occlusion = 1.0;
-    const double EPSILON = 1e-1;
     if(light->castShadows)
       /* EPSILON offset to avoid self-shadowing */
-      light_occlusion = soft_shadow(shadow_ray, sdf, EPSILON, max_d);
+      light_occlusion = soft_shadow(shadow_ray, sdf, max_d);
 
     // find half-angle vector for specular reflections
     // OLD: R3 v = normalize(-ray.direction);
