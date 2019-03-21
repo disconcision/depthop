@@ -5,7 +5,7 @@
 #include "field.h"
 
 #include "sdf/rigid.h"
-#include "sdf/primitives.h"
+#include "sdf/primitive.h"
 #include "sdf/domain.h"
 #include "sdf/combinator.h"
 

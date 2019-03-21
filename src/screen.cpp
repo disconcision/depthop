@@ -12,10 +12,11 @@ R coordTransform(R x, R d_src, R d_target) {
 }
 
 Ray screen(const Camera &camera,
-           const int i, const int j,
+           const unsigned i, const unsigned j,
            Image &image) {
   /* returns a ray from the eye of the camera
    * through pixel (i,j) on the image screen */
+
   R3 rayDirectionInCameraspace(
           coordTransform(j, camera.width, image.width),
           coordTransform(image.height - i, camera.height, image.height),
@@ -23,7 +24,5 @@ Ray screen(const Camera &camera,
 
   R3x3 cameraToWorld = R3x3_from_3xR3(camera.u, camera.v, camera.w);
 
-  Ray ray(camera.e, normalize(cameraToWorld*rayDirectionInCameraspace));
-
-  return ray;
+  return Ray(camera.e, normalize(cameraToWorld*rayDirectionInCameraspace));
 }

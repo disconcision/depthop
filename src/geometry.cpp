@@ -25,7 +25,7 @@ R3 clampR3(R3 x, R lo, R hi) {
           clamp(x(2), lo, hi));
 }
 
-double mix(R x, R y, R a) {
+R mix(R x, R y, R a) {
   return (1 - a)*x + a*y;
 }
 

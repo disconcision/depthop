@@ -7,6 +7,8 @@
 
 #include "Objects/types.h"
 
+
 R field(R3 p);
+
 
 #endif //RAYMARCHER_FIELD_H

@@ -7,6 +7,7 @@
 
 #include "Objects/types.h"
 
+
 /* translates sdf f through displacement d */
 auto move (R3 d, SDF f) -> SDF;
 

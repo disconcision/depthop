@@ -7,6 +7,7 @@
 
 #include "Objects/types.h"
 
+
 /* union of two distance fields */
 auto join (SDF f, SDF g) -> SDF;
 

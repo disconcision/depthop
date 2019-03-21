@@ -7,11 +7,11 @@
 //#include <iostream>
 
 
-double march_softshadow(
-        const Ray& ray,
-        double (&sdf)(R3),
-        const double min_d,
-        const double max_d) {
+double soft_shadow(
+        const Ray &ray,
+        R (&sdf)(R3),
+        const R min_d,
+        const R max_d) {
   /*
    * SDF SOFT SHADOWS
    *
@@ -26,27 +26,27 @@ double march_softshadow(
    * REF: https://iquilezles.org/www/articles/rmshadows/rmshadows.htm
    *
    */
-  double depth = min_d;
-  unsigned MAX_STEPS = 160;
-  double EPSILON = 1e-5;
-  double shadow_factor = 1.0; // initial value; falling
-  double softness = 4; // 1: very soft to 64: very hard
+  const unsigned MAX_STEPS = 160;
+  const R EPSILON = 1e-5;
+  const R softness = 4.0; // 1: very soft to 64: very hard
+  R shadow_factor = 1.0; // initial value; falling
+  R depth = min_d;
 
   for (unsigned i=0; i < MAX_STEPS; i++) {
-    double d = sdf(ray.origin + depth*ray.direction);
-    if (d < EPSILON) return 0.0;
-    shadow_factor = min(shadow_factor, softness*d/depth);
-    depth += d;
+    R distance = sdf(follow(ray, depth));
+    if (distance < EPSILON) return 0.0;
+    shadow_factor = min(shadow_factor, softness*distance/depth);
+    depth += distance;
     if (depth >= max_d) break;
   }
-  return shadow_factor;
+  return clamp(shadow_factor, 0.0, 1.0);
 }
 
 
 double ambient_occlusion(
-        double (&sdf)(R3),
-        const R3 &p,
-        const R3 &n) {
+        R (&sdf)(R3),
+        const R3& p,
+        const R3& n) {
   /*
    * SDF AMBIENT OCCLUSION
    *
@@ -63,14 +63,13 @@ double ambient_occlusion(
    * REF: http://9bitscience.blogspot.com/2013/07/
    *
    * */
-  double depth = 1e-2;
-  unsigned MAX_STEPS = 5;
-  double step_size = 0.3;
-  double occlusion_factor = 1.0;
-  Ray ray = Ray(p,n);
+  const unsigned MAX_STEPS = 5;
+  const R step_size = 0.3;
+  R occlusion_factor = 1.0;
+  R depth = 1e-2;
 
   for (unsigned i=1; i < MAX_STEPS; i++) {
-    double distance = sdf(follow(ray, depth));
+    R distance = sdf(follow(Ray(p,n), depth));
     depth += step_size;
     occlusion_factor -= (depth - distance)/(i*i);//(pow(2,i));
   }
@@ -86,12 +85,12 @@ R3 cMult(R3 a, R3 b) {
 
 
 Color shade_blinn_phong(
-        const Ray &ray,
-        double (&sdf)(R3),
-        const int &hit_id,
-        const double &depth,
-        const R3 &n,
-        const Lights &lights) {
+        const Ray& ray,
+        R (&sdf)(R3),
+        const unsigned& hit_id,
+        const R& depth,
+        const R3& n,
+        const Lights& lights) {
 
   // todo: get material properties
   //auto material = some_function[hit_id]->material;
@@ -109,23 +108,23 @@ Color shade_blinn_phong(
   // ambient occlusion
   double ao = ambient_occlusion(sdf, follow(ray, depth), n);
 
-  for (auto &light : lights) {
+  for (auto &light : lights.data) {
 
     R3 point = follow(ray, depth);
 
     // determine light direction & distance
     R3 light_direction;
-    double max_d;
+    R max_d;
     light->direction(point, light_direction, max_d);
     Color I = light->I;
 
     // determine shadow factor
     Ray shadow_ray(point, light_direction);
     double light_occlusion = 1.0;
-    double EPSILON = 1e-1;
+    const double EPSILON = 1e-1;
     if(light->castShadows)
       /* EPSILON offset to avoid self-shadowing */
-      light_occlusion = march_softshadow(shadow_ray, sdf, EPSILON, max_d);
+      light_occlusion = soft_shadow(shadow_ray, sdf, EPSILON, max_d);
 
     // find half-angle vector for specular reflections
     // OLD: R3 v = normalize(-ray.direction);
@@ -142,14 +141,14 @@ Color shade_blinn_phong(
 }
 
 
-//lightray(ray, hit_id, n, depth);
+
 Color shade(
         const Ray& ray,
-        double (&sdf)(R3),
+        R (&sdf)(R3),
         const Lights& lights,
-        const int hit_id,
+        const unsigned hit_id,
         const R3& n,
-        const double depth) {
+        const R depth) {
 
   return shade_blinn_phong(ray, sdf, hit_id, depth, n, lights);
 }

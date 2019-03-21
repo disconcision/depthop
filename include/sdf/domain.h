@@ -7,6 +7,7 @@
 
 #include "Objects/types.h"
 
+
 /* make the inside, out */
 auto complement (SDF f) -> SDF;
 
@@ -26,5 +27,6 @@ auto repeat_x (R d, SDF f) -> SDF;
 
 /* todo: wtf do i do */
 auto circular_y (R a, SDF f) -> SDF;
+
 
 #endif //RAYMARCHER_DOMAIN_H

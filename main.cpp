@@ -5,17 +5,22 @@
 #include "Objects/Ray.h"
 #include "Objects/Camera.h"
 #include "Objects/Image.h"
+#include "Objects/Lights.h"
 
 #include "screen.h"
 #include "field.h"
 #include "march.h"
 #include "shade.h"
-#include "write.h"
+//#include "write.h"
 
 #include <Eigen/Geometry>
 #include <iostream>
 
 #include <omp.h>
+
+
+const R MIN_D = 0.0;
+const R MAX_D =  200.0;
 
 
 int main(int argc, char* argv[])
@@ -38,24 +43,21 @@ int main(int argc, char* argv[])
   camera.v = R3(0,1,0);
   camera.w = -R3(0,0,-1);
   camera.u = camera.v.cross(camera.w);
-  camera.width = 1.0;
   camera.height = 1.0;
+  camera.width = width/(double)height;
 
 
   /* LIGHTS */
 
   Lights lights;
-  std::shared_ptr<DirectionalLight> light0(new DirectionalLight());
-  light0->d = R3(-1,-1,-1);
-  light0->I = R3(0.8,0.8,0.8);
-  light0->castShadows = true;
-  lights.push_back(light0);
-  std::shared_ptr<DirectionalLight> light1(new DirectionalLight());
-  light1->d = R3(-0,1,0);
-  light1->I = R3(0.0,0.3,0.8);
-  light1->castShadows = false;
-  lights.push_back(light1);
-
+  lights.add_directional(
+          R3(-1,-1,-1),
+          Color(0.8,0.8,0.8),
+          true);
+  lights.add_directional(
+          R3(-0, 1, 0),
+          Color(0.0,0.3,0.8),
+          false);
 
   /*
    * for each pixel (i,j) in the image plane,
@@ -72,13 +74,12 @@ int main(int argc, char* argv[])
       Ray ray = screen(camera, i, j, image);
       unsigned hit;
       R3 normal;
-      R depth = march(ray, field, 0.0, 200.0, normal, hit);
+      R depth = march(ray, field, MIN_D, MAX_D, normal, hit);
       Color c = shade(ray, field, lights, hit, normal, depth);
       image.set_pixel(i, j, c);
     }
   }
-
-  write("scene.ppm", image);
+  image.to_file("scene.ppm");
 }
 
 

@@ -10,10 +10,14 @@
 #include "Objects/Camera.h"
 #include "Objects/Image.h"
 
+
+/* returns a ray from the eye of the camera
+ * through pixel (i,j) on the image screen */
 Ray screen(
         const Camera &camera,
-        const int i,
-        const int j,
+        const unsigned i,
+        const unsigned j,
         Image &image);
+
 
 #endif //RAYMARCHER_VIEWING_RAY_H

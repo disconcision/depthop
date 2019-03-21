@@ -7,6 +7,9 @@
 
 #include "types.h"
 #include <vector>
+#include <fstream>
+#include <iterator>
+
 
 struct Image {
 
@@ -21,12 +24,39 @@ struct Image {
       this->data = std::vector<unsigned char>(n_c*w*h);
     }
 
+
     void set_pixel(unsigned i, unsigned j, Color color) {
+      /* set pixel (i,j) to color, which is converted from
+       * a double in [0.0, 1.0] to an integer in [0, 255]*/
       for (unsigned c=0; c < this->num_channels; c++) {
         this->data[c + this->num_channels*(j + i*this->width)]
                 = (unsigned char) (255*color(c));
       }
     }
+
+
+    bool to_file(const std::string &filename) {
+      /* write image data to a PPM file */
+      std::ofstream f;
+      f.open(filename);
+      if (!f) return false;
+
+      std::string code;
+      if (this->num_channels == 1)
+        code = "P2\n";
+      else
+        code = "P3\n";
+
+      f << code << "\n" << this->width << " "
+        << this->height << "\n" << 255 << "\n";
+
+      std::copy(this->data.begin(), this->data.end(),
+                std::ostream_iterator<int>(f, " "));
+
+      f.close();
+      return true;
+    }
 };
+
 
 #endif //RAYMARCHER_IMAGE_H
