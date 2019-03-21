@@ -5,8 +5,10 @@
 #include "Objects/DirectionalLight.h"
 
 void DirectionalLight::direction(
-        const vec3 &p, vec3 &d, double &max_t) const {
+        const R3& p,
+        R3& d,
+        double& max_d) const {
   // ignore query point
   d = - this->d.normalized();
-  max_t = DBL_INFINITY;
+  max_d = DBL_INFINITY;
 }

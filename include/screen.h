@@ -5,6 +5,7 @@
 #ifndef RAYMARCHER_VIEWING_RAY_H
 #define RAYMARCHER_VIEWING_RAY_H
 
+#include "Objects/types.h"
 #include "Objects/Ray.h"
 #include "Objects/Camera.h"
 #include "Objects/Image.h"

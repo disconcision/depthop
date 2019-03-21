@@ -11,10 +11,10 @@
 class DirectionalLight : public Light {
 
 public:
-    vec3 d; // light-to-scene direction
+    R3 d; // light-to-scene direction
     void direction(
-            const vec3& p,
-            vec3& d,
+            const R3& p,
+            R3& d,
             double& max_t
     ) const;
 };

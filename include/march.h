@@ -8,10 +8,12 @@
 #include "Objects/Ray.h"
 #include "Objects/types.h"
 
-Color march(
+R march(
         const Ray& ray,
-        double (&sdf)(vec3),
-        const double min_d,
-        const double max_d);
+        R (&sdf)(R3),
+        double min_d,
+        double max_d,
+        R3& n,
+        unsigned& hit_id);
 
 #endif //RAYMARCHER_MARCH_H

@@ -12,11 +12,6 @@
 #include "shade.h"
 #include "write.h"
 
-#include "sdf/sphereSDF.h"
-#include "sdf/boxSDF.h"
-#include "sdf/torusSDF.h"
-#include "sdf/cylinderSDF.h"
-
 #include <Eigen/Geometry>
 #include <iostream>
 
@@ -30,13 +25,13 @@ void set_pixel(Image &image, unsigned i, unsigned j, Color color) {
   }
 }
 
-
+/*
 bool intersect(
         const Ray & ray, const double min_t, double & t, Eigen::Vector3d & n){
 
   Eigen::Vector3d d = ray.direction;
   Eigen::Vector3d e = ray.origin;
-  Eigen::Vector3d c = vec3(0,0,0);// todo: hardcode
+  Eigen::Vector3d c = R3(0,0,0);// todo: hardcode
   double r = 1; // todo: hardcode
 
   // set up quadratic to solve for intersections
@@ -68,9 +63,11 @@ bool intersect(
     return t >= min_t;
   }
 }
+*/
+
 /*
 double tt;
-vec3 nn;
+R3 nn;
 if (intersect(ray, 1.0, tt, nn)) {
   //c = {0.8,0.3,0.2};
   c[0] = (nn(0)*0.5+0.5);
@@ -84,16 +81,6 @@ if (intersect(ray, 1.0, tt, nn)) {
 int main(int argc, char* argv[])
 {
 
-  // set up camera
-  Camera camera;
-  camera.d = 1.0;
-  camera.e = vec3(0,0,5);
-  camera.v = vec3(0,1,0);
-  camera.w = -vec3(0,0,-1);
-  camera.u = camera.v.cross(camera.w);
-  camera.width = 1.0;
-  camera.height = 1.0;
-
   // set up output image
   Image image;
   if (argc != 3) {
@@ -106,15 +93,42 @@ int main(int argc, char* argv[])
   image.num_channels = 3;
   image.data = std::vector<unsigned char>(image.num_channels*image.width*image.height);
 
+
+  // set up camera
+  Camera camera;
+  camera.d = 1.0;
+  camera.e = R3(0,0,5);
+  camera.v = R3(0,1,0);
+  camera.w = -R3(0,0,-1);
+  camera.u = camera.v.cross(camera.w);
+  camera.width = 1.0;
+  camera.height = 1.0;
+
+
+  // set up lights
+  Lights lights;
+  std::shared_ptr<DirectionalLight> light0(new DirectionalLight());
+  light0->d = R3(-1,-1,-1);
+  light0->I = R3(0.8,0.8,0.8);
+  light0->castShadows = true;
+  lights.push_back(light0);
+  std::shared_ptr<DirectionalLight> light1(new DirectionalLight());
+  light1->d = R3(-0,1,0);
+  light1->I = R3(0,0.3,0.8);
+  light1->castShadows = false;
+  lights.push_back(light1);
+
+
   #pragma omp parallel num_threads(6)
   #pragma omp for schedule(dynamic,1)
   for (unsigned i = 0; i < image.height; ++i) {
     for (unsigned j = 0; j < image.width; ++j) {
       // get a ray from camera eye through screen pixel (i,j)
       Ray ray = screen(camera, i, j, image);
-      // march on the ray and find a color
-      Color c = march(ray, field, 0.0, 200.0);
-      // set that pixel
+      unsigned hit;
+      R3 normal;
+      R depth = march(ray, field, 0.0, 200.0, normal, hit);
+      Color c = shade(ray, field, lights, hit, normal, depth);
       set_pixel(image, i, j, c);
     }
   }

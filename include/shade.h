@@ -9,15 +9,13 @@
 #include "Objects/Light.h"
 #include "Objects/types.h"
 #include "Objects/DirectionalLight.h"
-#include <memory>
-
-using Lights =  std::vector< std::shared_ptr<Light>>;
 
 Color shade(
-        const Ray &ray,
-        double (&sdf)(vec3),
+        const Ray& ray,
+        double (&sdf)(R3),
+        const Lights& lights,
         const int hit_id,
-        const vec3 &n,
+        const R3& n,
         const double depth);
 
 #endif //RAYMARCHER_SHADE_H

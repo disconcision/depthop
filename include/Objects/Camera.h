@@ -9,8 +9,8 @@
 #include "types.h"
 
 struct Camera {
-  vec3 e; // eye
-  vec3 u,v,w; // v is up, -w is view direction, u = vxw
+  R3 e; // eye
+  R3 u,v,w; // v is up, -w is view direction, u = vxw
   double d; // distance to focal plane
   double width, height; // image plane
 };

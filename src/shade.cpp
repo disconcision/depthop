@@ -3,24 +3,17 @@
 //
 
 #include "shade.h"
-#include <iostream>
-//#include <algorithm>
-
+#include "geometry.h"
+//#include <iostream>
 
 
 double march_softshadow(
         const Ray& ray,
-        double (&sdf)(vec3),
+        double (&sdf)(R3),
         const double min_d,
         const double max_d) {
-
-  double depth = min_d;
-  unsigned MAX_STEPS = 160;
-  double EPSILON = 1e-5;
-  double shadow_factor = 1.0;
-  double softness = 4; /* 1: very soft, 64: very hard*/
-
-  /* SDF SOFT SHADOWS
+  /*
+   * SDF SOFT SHADOWS
    *
    * As in raytracing, we follow a ray from the object
    * towards the light. Instead of just looking for
@@ -33,6 +26,11 @@ double march_softshadow(
    * REF: https://iquilezles.org/www/articles/rmshadows/rmshadows.htm
    *
    */
+  double depth = min_d;
+  unsigned MAX_STEPS = 160;
+  double EPSILON = 1e-5;
+  double shadow_factor = 1.0; // initial value; falling
+  double softness = 4; // 1: very soft to 64: very hard
 
   for (unsigned i=0; i < MAX_STEPS; i++) {
     double d = sdf(ray.origin + depth*ray.direction);
@@ -46,19 +44,11 @@ double march_softshadow(
 
 
 double ambient_occlusion(
-        double (&sdf)(vec3),
-        const vec3 &p,
-        const vec3 &n) {
-
-  double depth = 1e-2;
-  unsigned MAX_STEPS = 5;
-  double step_size = 0.3;
-  double occ_factor = 1.0;
-  Ray ray;
-  ray.origin = p;
-  ray.direction = n;
-
-  /* SDF AMBIENT OCCLUSION
+        double (&sdf)(R3),
+        const R3 &p,
+        const R3 &n) {
+  /*
+   * SDF AMBIENT OCCLUSION
    *
    * we follow the normal for a fixed number of fixed-size
    * steps. at each point, we compare the distance we've travelled
@@ -73,109 +63,94 @@ double ambient_occlusion(
    * REF: http://9bitscience.blogspot.com/2013/07/
    *
    * */
-
+  double depth = 1e-2;
+  unsigned MAX_STEPS = 5;
+  double step_size = 0.3;
+  double occlusion_factor = 1.0;
+  Ray ray = Ray(p,n);
 
   for (unsigned i=1; i < MAX_STEPS; i++) {
-    double d = sdf(ray.origin + depth*ray.direction);
+    double distance = sdf(follow(ray, depth));
     depth += step_size;
-    occ_factor -= (depth - d)/(i*i);//(pow(2,i));
+    occlusion_factor -= (depth - distance)/(i*i);//(pow(2,i));
   }
-  return occ_factor;
+  return occlusion_factor;
 }
 
 
 
 
-vec3 cMult(vec3 a, vec3 b) {
+R3 cMult(R3 a, R3 b) {
   return (a.array() * b.array()).matrix();
 }
 
 
 Color shade_blinn_phong(
         const Ray &ray,
-        double (&sdf)(vec3),
+        double (&sdf)(R3),
         const int &hit_id,
-        const double &t,
-        const vec3 &n,
-        Lights &lights) {
+        const double &depth,
+        const R3 &n,
+        const Lights &lights) {
+
+  // todo: get material properties
+  //auto material = some_function[hit_id]->material;
+  double alpha = 800;
+  Color ka = Color(0.1,0.1,0.1),
+        kd = Color(0.7,0.7,0.7),
+        ks = Color(0.8,0.8,0.8);
 
   Color rgb = Color(0,0,0);
 
-  // ambient light intensity
-  vec3 Ia = vec3(0.1,0.1,0.1);
+  // add ambient light contribution
+  R3 Ia = R3(0.1,0.1,0.1);
+  rgb += cMult(Ia, ka);
 
-  // offset to avoid self-shadowing
-  double epsilon = 1e-5;
+  // ambient occlusion
+  double ao = ambient_occlusion(sdf, follow(ray, depth), n);
 
   for (auto &light : lights) {
 
-    // point on object p = e + t*d
-    vec3 p = ray.origin+t*ray.direction;
+    R3 point = follow(ray, depth);
 
     // determine light direction & distance
-    vec3 l;
+    R3 light_direction;
     double max_d;
-    light->direction(p,l,max_d);
+    light->direction(point, light_direction, max_d);
     Color I = light->I;
 
     // determine shadow factor
-    Ray shadow_ray;
-    shadow_ray.origin = p;
-    shadow_ray.direction = l;
-    double light_occlusion;
+    Ray shadow_ray(point, light_direction);
+    double light_occlusion = 1.0;
+    double EPSILON = 1e-1;
     if(light->castShadows)
-      light_occlusion = march_softshadow(shadow_ray, sdf,1e-1,max_d);
-    else
-      light_occlusion = 1.0;
-    //std::cout << light_occlusion << "\n";
-
-    // todo: get material properties
-    //auto materal = some_function[hit_id]->material;
-    double alpha = 2000;
-    Color ka = Color(0.1,0.1,0.1),
-          kd = Color(0.7,0.7,0.7),
-          ks = Color(0.8,0.8,0.8);
-
-    // add ambient light contribution
-    rgb += cMult(Ia, ka);
-
-    int new_hit_id;
+      /* EPSILON offset to avoid self-shadowing */
+      light_occlusion = march_softshadow(shadow_ray, sdf, EPSILON, max_d);
 
     // find half-angle vector for specular reflections
-    vec3 v = -ray.direction.normalized();
-    vec3 h = (l + v).normalized();
+    // OLD: R3 v = normalize(-ray.direction);
+    R3 h = normalize(light_direction - ray.direction);
 
-    // add diffuse and specular contribution for this light
-    rgb += light_occlusion* (cMult(I, kd * (std::max(0.0, n.dot(l))))
-            + cMult(I, ks * pow(std::max(0.0, n.dot(h)), alpha)));
+    Color diffuse_factor = kd * max(0.0, dotR3(n, light_direction));
+    Color specular_factor = ks * pow(max(0.0, dotR3(n, h)), alpha);
 
+    rgb += light_occlusion * cMult(I, diffuse_factor + specular_factor);
   }
 
-  //return Color(1,1,1)*ambient_occlusion(sdf,ray.origin+t*ray.direction,n);
-  double ao = ambient_occlusion(sdf,ray.origin+t*ray.direction,n);
-  return rgb*ao;
+  // uncomment to eliminate cool noise on bkg
+  return rgb*ao; //clampR3(rgb*ao,0,1);
 }
 
 
 //lightray(ray, hit_id, n, depth);
 Color shade(
-        const Ray &ray,
-        double (&sdf)(vec3),
+        const Ray& ray,
+        double (&sdf)(R3),
+        const Lights& lights,
         const int hit_id,
-        const vec3 &n,
+        const R3& n,
         const double depth) {
 
-  Lights lights;
-  std::shared_ptr<DirectionalLight> light0(new DirectionalLight());
-  light0->d = vec3(-1,-1,-1);
-  light0->I = vec3(0.8,0.8,0.8);
-  light0->castShadows = true;
-  lights.push_back(light0);
-  std::shared_ptr<DirectionalLight> light1(new DirectionalLight());
-  light1->d = vec3(-0,1,0);
-  light1->I = vec3(0,0.3,0.8);
-  light1->castShadows = false;
-  lights.push_back(light1);
   return shade_blinn_phong(ray, sdf, hit_id, depth, n, lights);
 }
 

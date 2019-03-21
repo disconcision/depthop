@@ -7,19 +7,17 @@
 
 #include "Objects/types.h"
 
+/* translates sdf f through displacement d */
+auto move (R3 d, SDF f) -> SDF;
 
-template <typename SDF_>
-auto affine (R4x4 T_inv, SDF_ f);
+/* affine-transforms SDF f according to the
+ * INVERSE of the provided transformation */
+auto affine (R4x4 T_inv, SDF f) -> SDF;
 
-template <typename SDF_>
-auto rotate_x (R a, SDF_ f);
-
-// std::function<SDF(R,SDF)>
-template <typename SDF_>
-auto rotate_y (R a, SDF_ f);
-
-template <typename SDF_>
-auto rotate_z (R a, SDF_ f);
+/* rotate SDF f through angle a (radians) */
+auto rotate_x (R a, SDF f) -> SDF;
+auto rotate_y (R a, SDF f) -> SDF;;
+auto rotate_z (R a, SDF f) -> SDF;;
 
 
 #endif //RAYMARCHER_RIGID_H

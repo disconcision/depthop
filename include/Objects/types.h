@@ -8,28 +8,25 @@
 #include <Eigen/Core>
 #include <limits>
 #include <vector>
-#include <algorithm>
 #include <functional>
 
-using vec2 = Eigen::Vector2d;
-using vec3 = Eigen::Vector3d;
-using mat3 = Eigen::Matrix3d;
-using mat4 = Eigen::Matrix4d;
-using Color = Eigen::Vector3d;
 
 using std::max;
 using std::min;
 
 const double DBL_INFINITY = std::numeric_limits<double>::infinity();
 
+using Color = Eigen::Vector3d;
+
 using R = double;
+using R2 = Eigen::Vector2d;
 using R3 = Eigen::Vector3d;
 using R4 = Eigen::Vector4d;
+using R2x2 = Eigen::Matrix2d;
+using R3x3 = Eigen::Matrix3d;
 using R4x4 = Eigen::Matrix4d;
-using R3x4 = Eigen::MatrixXd;
 
 using SDF = std::function<R(R3)>;
-
 
 
 #endif //RAYMARCHER_TYPES_H

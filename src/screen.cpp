@@ -3,30 +3,27 @@
 //
 
 #include "screen.h"
-#include <iostream>
+#include "geometry.h"
 
-/* transforms a single coordinate from screenspace to cameraspace */
-double coordTransform(double i, double d_src, double d_target) {
-    return (d_src * (i + 0.5)/d_target) - d_src/2;
+
+R coordTransform(R x, R d_src, R d_target) {
+  /* per-coordinate screenspace to cameraspace */
+  return (d_src * (x + 0.5)/d_target) - d_src/2;
 }
 
 Ray screen(const Camera &camera,
            const int i, const int j,
-           Image &image)
-{
-  // cameraspace direction of ray
-  vec3 rayDirectionInCameraspace(
+           Image &image) {
+  /* returns a ray from the eye of the camera
+   * through pixel (i,j) on the image screen */
+  R3 rayDirectionInCameraspace(
           coordTransform(j, camera.width, image.width),
           coordTransform(image.height - i, camera.height, image.height),
           -camera.d);
 
-  // camera to worldspace transformation matrix
-  mat3 cameraToWorld(3,3);
-  cameraToWorld << camera.u, camera.v, camera.w;
+  R3x3 cameraToWorld = R3x3_from_3xR3(camera.u, camera.v, camera.w);
 
-  Ray ray;
-  ray.origin = camera.e;
-  ray.direction = (cameraToWorld*rayDirectionInCameraspace).normalized();
+  Ray ray(camera.e, normalize(cameraToWorld*rayDirectionInCameraspace));
 
   return ray;
 }

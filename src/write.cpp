@@ -1,13 +1,11 @@
 #include "write.h"
 #include <fstream>
-#include <cassert>
-#include <iostream>
 #include <iterator>
 
 bool write(
         const std::string &filename,
-        Image &image)
-{
+        Image &image) {
+
     std::ofstream f;
     f.open(filename);
     if (!f) return false;

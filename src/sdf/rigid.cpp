@@ -5,38 +5,44 @@
 #include "sdf/rigid.h"
 
 
-/* affine :: (R4x4, SDF) -> SDF
-* affine-transforms the SDF according to the
-* INVERSE of the provided transformation */
-template <typename SDF_>
-auto affine (R4x4 T_inv, SDF_ f) {
+/* translates SDF through displacement d */
+auto move (R3 d, SDF f) -> SDF {
+  return [f, d] (R3 x) {
+      return f(x - d);};}
+
+/* affine-transforms SDF f according to the
+ * INVERSE of the provided transformation */
+auto affine (R4x4 T_inv, SDF f) -> SDF {
     return [f, T_inv] (R3 x) {
         R4 t = T_inv*R4(x(0),x(1),x(2),1);
         return f(R3(t(0),t(1),t(2)));};};
 
-template <typename SDF_>
-auto rotate_x (R a, SDF_ f) {
-    R4x4 T;
-    T << 1,       0,        0, 0,
-            0, cos(-a), -sin(-a), 0,
-            0, sin(-a),  cos(-a), 0,
-            0,       0,        0, 1;
-    return affine(T, f);};
 
-template <typename SDF_>
-auto rotate_y (R a, SDF f) {
+/* rotate SDF f through angle a (radians) */
+auto rotate_x (R a, SDF f) -> SDF {
+    R c = cos(-a), s = sin(-a);
     R4x4 T;
-    T <<  cos(-a), 0, sin(-a), 0,
-            0,       1,       0, 0,
-            -sin(-a), 0, cos(-a), 0,
-            0,       0,       0, 1;
+    T <<
+    1,  0,  0,  0,
+    0,  c, -s,  0,
+    0,  s,  c,  0,
+    0,  0,  0,  1;
     return affine(T, f);};
-
-template <typename SDF_>
-auto rotate_z (R a, SDF f) {
+auto rotate_y (R a, SDF f) -> SDF {
+    R c = cos(-a), s = sin(-a);
     R4x4 T;
-    T << cos(-a), -sin(-a), 0, 0,
-            sin(-a),  cos(-a), 0, 0,
-            0,        0,       1, 0,
-            0,        0,       0, 1;
+    T <<
+     c,  0,  s,  0,
+     0,  1,  0,  0,
+    -s,  0,  c,  0,
+     0,  0,  0,  1;
+    return affine(T, f);};
+auto rotate_z (R a, SDF f)  -> SDF {
+    R c = cos(-a), s = sin(-a);
+    R4x4 T;
+    T <<
+    c, -s,  0,  0,
+    s,  c,  0,  0,
+    0,  0,  1,  0,
+    0,  0,  0,  1;
     return affine(T, f);};

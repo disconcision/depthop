@@ -7,6 +7,6 @@
 
 #include "Objects/types.h"
 
-double field(vec3 p);
+R field(R3 p);
 
 #endif //RAYMARCHER_FIELD_H

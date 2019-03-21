@@ -8,8 +8,12 @@
 #include "types.h"
 
 struct Ray {
-  vec3 origin;
-  vec3 direction;
+  R3 origin;
+  R3 direction;
+  Ray (R3 o, R3 d) {
+    this->origin = o;
+    this->direction = d;
+  }
 };
 
 #endif  //RAYMARCHER_RAY_H
