@@ -96,8 +96,13 @@ int main(int argc, char* argv[])
 
   // set up output image
   Image image;
-  image.width = 600;
-  image.height = 600;
+  if (argc != 3) {
+    image.width = 400;
+    image.height = 400;
+  } else {
+    image.width = (unsigned) strtol(argv[1], nullptr,0);
+    image.height = (unsigned) strtol(argv[2], nullptr,0);
+  }
   image.num_channels = 3;
   image.data = std::vector<unsigned char>(image.num_channels*image.width*image.height);
 
@@ -108,7 +113,7 @@ int main(int argc, char* argv[])
       // get a ray from camera eye through screen pixel (i,j)
       Ray ray = screen(camera, i, j, image);
       // march on the ray and find a color
-      Color c = march(ray, field, 0.0, 100.0);
+      Color c = march(ray, field, 0.0, 200.0);
       // set that pixel
       set_pixel(image, i, j, c);
     }

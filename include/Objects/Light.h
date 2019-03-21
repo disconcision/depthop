@@ -11,6 +11,7 @@ class Light {
 
 public:
     Color I;
+    bool castShadows;
     virtual ~Light() {};
     virtual void direction(
             const vec3& p, // query point

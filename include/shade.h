@@ -15,6 +15,7 @@ using Lights =  std::vector< std::shared_ptr<Light>>;
 
 Color shade(
         const Ray &ray,
+        double (&sdf)(vec3),
         const int hit_id,
         const vec3 &n,
         const double depth);
