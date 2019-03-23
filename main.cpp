@@ -66,7 +66,6 @@ int main(int argc, char* argv[]) {
     for (unsigned j = 0; j < image.width; ++j) {
       Ray ray = screen(camera, image, i, j);
       unsigned hit, steps;
-      R3 normal;
       R depth = march(ray, field, steps, hit);
       Color c = shade(ray, field, lights, depth, steps, hit);
       image.set_pixel(i, j, c);
