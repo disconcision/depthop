@@ -6,7 +6,7 @@ set(SHARED_ROOT "${CMAKE_CURRENT_LIST_DIR}")
 
 # Add your project files
 include_directories("include/")
-file(GLOB SRCFILES src/*.cpp src/sdf/* src/Objects/*.cpp)
+file(GLOB SRCFILES src/*.cpp src/sdf/*.cpp src/Objects/*.cpp)
 list(APPEND SRCFILES main.cpp)
 
 # create executable
@@ -24,4 +24,3 @@ endif()
 add_executable(${PROJECT_NAME} ${SRCFILES})
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${SHARED_ROOT}/shared/eigen)
 target_link_libraries(${PROJECT_NAME} )
-

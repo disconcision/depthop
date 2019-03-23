@@ -16,7 +16,7 @@ using std::min;
 
 const double DBL_INFINITY = std::numeric_limits<double>::infinity();
 
-using Color = Eigen::Vector3d;
+using N = unsigned;
 
 using R = double;
 using R2 = Eigen::Vector2d;
@@ -25,6 +25,9 @@ using R4 = Eigen::Vector4d;
 using R2x2 = Eigen::Matrix2d;
 using R3x3 = Eigen::Matrix3d;
 using R4x4 = Eigen::Matrix4d;
+
+using Angle = R;
+using Color = R3;
 
 using SDF = std::function<R(R3)>;
 

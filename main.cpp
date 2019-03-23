@@ -63,15 +63,15 @@ int main(int argc, char* argv[]) {
    * those values and set the pixel accordingly.
    *
    */
-  #pragma omp parallel num_threads(NUM_THREADS)
+  #pragma omp parallel num_threads(1)
   #pragma omp for schedule(dynamic,1)
   for (unsigned i = 0; i < image.height; ++i) {
     for (unsigned j = 0; j < image.width; ++j) {
       Ray ray = screen(camera, image, i, j);
-      unsigned hit;
+      unsigned hit, steps;
       R3 normal;
-      R depth = march(ray, field, MIN_D, MAX_D, normal, hit);
-      Color c = shade(ray, field, lights, hit, normal, depth);
+      R depth = march(ray, field, MIN_D, MAX_D, steps, hit);
+      Color c = shade(ray, field, lights, hit, steps, depth);
       image.set_pixel(i, j, c);
     }
   }

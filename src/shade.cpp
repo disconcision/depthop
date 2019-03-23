@@ -5,10 +5,13 @@
 #include "shade.h"
 #include "geometry.h"
 #include "constants.h"
+#include "noise.h"
 
 
 
-double soft_shadow(
+#include <iostream>
+
+R soft_shadow(
         const Ray &ray,
         R (&sdf)(R3),
         const R max_d) {
@@ -40,7 +43,8 @@ double soft_shadow(
 }
 
 
-double ambient_occlusion(
+
+R ambient_occlusion(
         R (&sdf)(R3),
         const R3& p,
         const R3& n) {
@@ -73,12 +77,6 @@ double ambient_occlusion(
 
 
 
-
-R3 cMult(R3 a, R3 b) {
-  return (a.array() * b.array()).matrix();
-}
-
-
 Color shade_blinn_phong(
         const Ray& ray,
         R (&sdf)(R3),
@@ -95,13 +93,9 @@ Color shade_blinn_phong(
         ks = Color(0.8,0.8,0.8);
 
   Color rgb = Color(0,0,0);
-
   // add ambient light contribution
   R3 Ia = R3(0.1,0.1,0.1);
   rgb += cMult(Ia, ka);
-
-  // ambient occlusion
-  double ao = ambient_occlusion(sdf, follow(ray, depth), n);
 
   for (auto &light : lights.data) {
 
@@ -116,22 +110,25 @@ Color shade_blinn_phong(
     // determine shadow factor
     Ray shadow_ray(point, light_direction);
     double light_occlusion = 1.0;
-    if(light->castShadows)
+    if(SHADOWS_ENABLED && light->castShadows)
       /* EPSILON offset to avoid self-shadowing */
       light_occlusion = soft_shadow(shadow_ray, sdf, max_d);
 
     // find half-angle vector for specular reflections
     // OLD: R3 v = normalize(-ray.direction);
     R3 h = normalize(light_direction - ray.direction);
-
-    Color diffuse_factor = kd * max(0.0, dotR3(n, light_direction));
-    Color specular_factor = ks * pow(max(0.0, dotR3(n, h)), alpha);
-
+    R3 noise_factor = 1*Color(0.5,0.5,0.5);
+    //R noise_factor = noise(point);
+    //R noise_factor = turbulence(point, 3.0, 0.55);
+    //R noise_factor = marble(point, R3(1.0, 2.0, 1.0), 1.8, 3.0, 0.55);
+    // std::cout << noise_factor << "\n";
+    Color diffuse_factor = kd*max(0.0, dot(n, light_direction));
+    Color specular_factor = ks * pow(max(0.0, dot(n, h)), alpha);
     rgb += light_occlusion * cMult(I, diffuse_factor + specular_factor);
   }
 
   // uncomment to eliminate cool noise on bkg
-  return rgb*ao; //clampR3(rgb*ao,0,1);
+  return rgb; //clampR3(rgb*ao,0,1);
 }
 
 
@@ -141,10 +138,25 @@ Color shade(
         R (&sdf)(R3),
         const Lights& lights,
         const unsigned hit_id,
-        const R3& n,
+        unsigned& steps,
         const R depth) {
 
-  return shade_blinn_phong(ray, sdf, hit_id, depth, n, lights);
+  /* two alternate coloring schemes */
+  if (COLOR_STEPS) {
+    return Color(1,1,1)*steps/(double)MARCH_MAX_STEPS;
+  } else if (COLOR_NORMAL) {
+    return normal(sdf, follow(ray, depth))*0.5+0.5*Color(1,1,1);
+  }
+
+  R3 n = normal(sdf, follow(ray, depth));
+  Color rgb = shade_blinn_phong(ray, sdf, hit_id, depth, n, lights);
+
+  if (AO_STEP_ENABLED) {
+    rgb *= steps/(double)MARCH_MAX_STEPS;
+  } else if (AO_ENABLED) {
+    rgb *= ambient_occlusion(sdf, follow(ray, depth), n);
+  }
+  return rgb;
 }
 
 

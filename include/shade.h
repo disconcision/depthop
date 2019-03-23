@@ -14,7 +14,7 @@ Color shade(
         R (&sdf)(R3),
         const Lights& lights,
         const unsigned hit_id,
-        const R3& n,
+        unsigned& steps,
         const R depth);
 
 #endif //RAYMARCHER_SHADE_H

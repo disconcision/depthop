@@ -27,7 +27,7 @@ auto scale (R s, SDF f) -> SDF {
  * the dxdxd cube centered at the origin */
 auto repeat (R3 d, SDF f) -> SDF {
   return [d, f] (R3 x) {
-      return f(modR3(x,d) - 0.5*d);};}
+      return f(mod(x,d) - 0.5*d);};}
 
 
 /* tile space with contents of f inside d units
