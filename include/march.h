@@ -14,8 +14,6 @@
  * depth to level set surface, up to max_d */
 R march(const Ray& ray,
         R (&sdf)(R3),
-        R min_d,
-        R max_d,
         unsigned& steps,
         unsigned& hit_id);
 

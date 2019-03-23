@@ -5,8 +5,6 @@
 #include "geometry.h"
 #include "constants.h"
 #include <Eigen/Geometry>
-//#include <cmath>
-//#include<functional>
 
 
 R3 normal(R (&sdf)(R3), const R3& p) {

@@ -31,7 +31,7 @@ R noise(R3 seed) {
 
   /* tile space with unit cubes */
   R3 current_cell = floor(seed);
-  R3 position_in_cell = fract(seed); // todo: ambiguity error when i try to overload fract for R3
+  R3 position_in_cell = fract(seed);
   R3 smooth_in_cell = smooth_step(position_in_cell);
 
   /* pick random directions at the corners of the unit cube
@@ -42,7 +42,6 @@ R noise(R3 seed) {
       for (N k=0; k<2; k++)
         c[i][j][k] = dot(randomR3(current_cell + R3(i,j,k)),
                          position_in_cell - R3(i,j,k));
-
 
   /* linearly interpolate between the values on the corners */
   R x = mix(mix(mix(c[0][0][0], c[1][0][0], smooth_in_cell(0)),

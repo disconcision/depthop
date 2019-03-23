@@ -5,7 +5,6 @@
 #include "screen.h"
 #include "geometry.h"
 
-
 R coordTransform(R x, R d_src, R d_target) {
   /* per-coordinate screenspace to cameraspace */
   return (d_src * (x + 0.5)/d_target) - d_src/2;

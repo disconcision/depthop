@@ -13,8 +13,8 @@ Color shade(
         const Ray& ray,
         R (&sdf)(R3),
         const Lights& lights,
-        const unsigned hit_id,
+        const R depth,
         unsigned& steps,
-        const R depth);
+        const unsigned hit_id);
 
 #endif //RAYMARCHER_SHADE_H

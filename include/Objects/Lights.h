@@ -38,6 +38,19 @@ public:
 };
 
 
+class PointLight : public Light {
+public:
+    R3 p; // light position
+    void direction(
+            const R3& q,
+            Eigen::Vector3d& d,
+            double & max_d) const {
+      d = (this->p - q).normalized();
+      max_d = (this->p - q).norm();
+    }
+};
+
+
 struct Lights {
 
     std::vector<std::shared_ptr<Light>> data;

@@ -15,8 +15,6 @@
 #include "shade.h"
 
 #include <omp.h>
-#include <Eigen/Geometry>
-#include <iostream>
 
 
 
@@ -33,14 +31,13 @@ int main(int argc, char* argv[]) {
 
   /* CAMERA */
 
-  Camera camera;
-  camera.d = 1.0;
-  camera.e = R3(0,0,5);
-  camera.v = R3(0,1,0);
-  camera.w = -R3(0,0,-1);
-  camera.u = camera.v.cross(camera.w);
-  camera.height = 1.0;
-  camera.width = width/(double)height;
+  Camera camera(
+          1.0,                  // focal distance
+          1.0,                  // frame width
+          width/(double)height, // frame height
+          R3(0,0,5),            // eye position
+          R3(0,0,-1),           // view direction
+          R3(0,1,0));           // up direction
 
 
   /* LIGHTS */
@@ -59,19 +56,19 @@ int main(int argc, char* argv[]) {
    * for each pixel (i,j) in the image plane,
    * take a ray from the camera through that pixel,
    * and march along that ray, returning a depth and
-   * a normal and a hit id. color the pixel based on
-   * those values and set the pixel accordingly.
+   * a number of steps and a hit id.
+   * color the pixel based on those values.
    *
    */
-  #pragma omp parallel num_threads(1)
+  #pragma omp parallel num_threads(NUM_THREADS)
   #pragma omp for schedule(dynamic,1)
   for (unsigned i = 0; i < image.height; ++i) {
     for (unsigned j = 0; j < image.width; ++j) {
       Ray ray = screen(camera, image, i, j);
       unsigned hit, steps;
       R3 normal;
-      R depth = march(ray, field, MIN_D, MAX_D, steps, hit);
-      Color c = shade(ray, field, lights, hit, steps, depth);
+      R depth = march(ray, field, steps, hit);
+      Color c = shade(ray, field, lights, depth, steps, hit);
       image.set_pixel(i, j, c);
     }
   }
