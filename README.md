@@ -1,11 +1,8 @@
 
+**🚧 UNDER CONTRUCTION 👷 **
 
-For this assignment, I've implemented a CPU raymarcher ic C++, parallelized via openMP.
-
-This is pretty much my own code, but adapts the general design of the raytracing assignment as a guide, cribbing heavily in places, and I integrated the noise code from my shaders assignment. There are a lot of in-line references to the places where I learned about the various techniques I adapted. In particular, credit goes to Inigo Quilez and his amazing creative and expository work on raymarching:
+Credits: There are a lot of in-line references to the places where I learned about the various techniques I adapted. In particular, credit goes to Inigo Quilez and his amazing creative and expository work on raymarching:
  - https://iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm
-
-Note: I kind of got too ambitious with this one... the provided scene is very basic and illustrates only a portion of the implemented functionality. I'll stick to describing things here which are more-or-less visible in the provided image.
 
 Briefly, raymarching is a technique where ray-geometry intersections are not calculated analytically, but via a 'marching' process whereby rays jump incrementally ('march') into the scene. The underlying geometry is implemented as a single function; a Signed Distance Function which takes as argument a point in space and returns the distance from that point to the nearest point on surface of the geometry. Each ray begins at the camera. We evaluate the SDF at that point, and then travel along the ray the returned distance, and then repeat the process until the distance becomes negative, indicating that we're now inside the geometry.
 
