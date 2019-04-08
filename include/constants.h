@@ -7,7 +7,7 @@
 
 
 /* OpenMP parallelization */
-#define NUM_THREADS 6
+#define NUM_THREADS 12
 
 
 /* IMAGES */

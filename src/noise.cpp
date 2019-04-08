@@ -53,7 +53,7 @@ R noise(R3 seed) {
             smooth_in_cell(2));
 
   /* return a value in [0,1] */
-  return 2*x - 1;
+  return -0.5*(2*x - 1);
 }
 
 

@@ -35,22 +35,36 @@ int main(int argc, char* argv[]) {
           1.0,                  // focal distance
           1.0,                  // frame width
           width/(double)height, // frame height
-          R3(0,0,5),            // eye position
-          R3(0,0,-1),           // view direction
+          R3(0,1,5),            // eye position
+          R3(0,-0.1,-1),           // view direction
           R3(0,1,0));           // up direction
 
 
   /* LIGHTS */
 
   Lights lights;
+
   lights.add_directional(
           R3(-1,-1,-1),
           Color(0.8,0.8,0.8),
           true);
+  /*
+  lights.add_directional(
+            R3(0,-1,0),
+            Color(0.4,0.4,0.4),
+            false);
+  */
+
   lights.add_directional(
           R3(-0, 1, 0),
           Color(0.0,0.3,0.8),
           false);
+
+    lights.add_point(
+            R3(0, 0, 0),
+            Color(0.0,0.0,4.0),
+            true);
+
 
   /*
    * for each pixel (i,j) in the image plane,
@@ -64,7 +78,7 @@ int main(int argc, char* argv[]) {
   #pragma omp for schedule(dynamic,1)
   for (unsigned i = 0; i < image.height; ++i) {
     for (unsigned j = 0; j < image.width; ++j) {
-      Ray ray = screen(camera, image, i, j);
+      Ray ray = screen_to_world(camera, image, i, j);
       unsigned hit, steps;
       R depth = march(ray, field, steps, hit);
       Color c = shade(ray, field, lights, depth, steps, hit);

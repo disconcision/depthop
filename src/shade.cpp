@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-R soft_shadow(
+R shadow_march(
         const Ray &ray,
         R (&sdf)(R3),
         const R max_d) {
@@ -21,7 +21,7 @@ R soft_shadow(
    * As in raytracing, we follow a ray from the object
    * towards the light. Instead of just looking for
    * intersections, though, we track the point of closest
-   * approach to the field (approximated as the minimum d
+   * approach to the field (stepwise approximated as the minimum d
    * value during marching), normalized by the distance to
    * the object at that approach. An additional softness
    * parameter is used to modulate this effect.
@@ -42,6 +42,27 @@ R soft_shadow(
   return clamp(shadow_factor, 0.0, 1.0);
 }
 
+/*
+R soft_shadows(
+        R3 &point,
+        Light &light,
+        R (&sdf)(R3)) {
+
+
+    // determine light direction & distance
+    R3 light_direction;
+    R max_d;
+    light.direction(point, light_direction, max_d);
+    Color I = light.I;
+
+    // determine shadow factor
+    Ray shadow_ray(point, light_direction);
+    if(SHADOWS_ENABLED && light.castShadows)
+
+        return shadow_march(shadow_ray, sdf, max_d);
+    else return 1.0;
+}
+*/
 
 
 R ambient_occlusion(
@@ -77,6 +98,7 @@ R ambient_occlusion(
 
 
 
+
 Color shade_blinn_phong(
         const Ray& ray,
         R (&sdf)(R3),
@@ -85,12 +107,11 @@ Color shade_blinn_phong(
         const R3& n,
         const Lights& lights) {
 
-  // todo: get material properties
-  //auto material = some_function[hit_id]->material;
+  // todo: implement materials
   double alpha = 800;
   Color ka = Color(0.1,0.1,0.1),
         kd = Color(0.7,0.7,0.7),
-        ks = Color(0.8,0.8,0.8);
+        ks = Color(0,0,0);
 
   Color rgb = Color(0,0,0);
   // add ambient light contribution
@@ -101,34 +122,34 @@ Color shade_blinn_phong(
 
     R3 point = follow(ray, depth);
 
-    // determine light direction & distance
     R3 light_direction;
     R max_d;
     light->direction(point, light_direction, max_d);
     Color I = light->I;
 
+    /* returns the occlusion factor at point
+    * due to shadows in light cast by the sdf */
+    R soft_shadows = 1.0;
     // determine shadow factor
     Ray shadow_ray(point, light_direction);
-    double light_occlusion = 1.0;
     if(SHADOWS_ENABLED && light->castShadows)
-      /* EPSILON offset to avoid self-shadowing */
-      light_occlusion = soft_shadow(shadow_ray, sdf, max_d);
+        soft_shadows = shadow_march(shadow_ray, sdf, max_d);
 
     // find half-angle vector for specular reflections
-    // OLD: R3 v = normalize(-ray.direction);
     R3 h = normalize(light_direction - ray.direction);
-    R3 noise_factor = 1*Color(0.5,0.5,0.5);
-    //R noise_factor = noise(point);
-    //R noise_factor = turbulence(point, 3.0, 0.55);
-    //R noise_factor = marble(point, R3(1.0, 2.0, 1.0), 1.8, 3.0, 0.55);
-    // std::cout << noise_factor << "\n";
-    Color diffuse_factor = kd*max(0.0, dot(n, light_direction));
-    Color specular_factor = ks * pow(max(0.0, dot(n, h)), alpha);
-    rgb += light_occlusion * cMult(I, diffuse_factor + specular_factor);
+
+    Color diffuse = kd*max(0.0, dot(n, light_direction)),
+          specular = ks * pow(max(0.0, dot(n, h)), alpha);
+
+    rgb += soft_shadows * cMult(I, diffuse + specular);
   }
 
-  // uncomment to eliminate cool noise on bkg
-  return rgb; //clampR3(rgb*ao,0,1);
+  // add noise (todo: refactor this)
+  R3 point = follow(ray, depth);
+  R nf = marble(point, R3(1.0, 0.5, 1.0), 4.8, 3.0, 0.55);
+  R3 noise_factor = nf*Color(0.07,0.07,0.07);
+
+  return noise_factor + rgb;
 }
 
 
@@ -149,14 +170,19 @@ Color shade(
   }
 
   R3 n = normal(sdf, follow(ray, depth));
-  Color rgb = shade_blinn_phong(ray, sdf, hit_id, depth, n, lights);
+  Color rgb;
+  if (depth >= MAX_D) {
+    rgb = Color(0.7,0.7,0.7);
+  } else {
+    rgb = shade_blinn_phong(ray, sdf, hit_id, depth, n, lights);
 
-  if (AO_STEP_ENABLED) {
-    rgb *= steps/(double)MARCH_MAX_STEPS;
-  } else if (AO_ENABLED) {
-    rgb *= ambient_occlusion(sdf, follow(ray, depth), n);
+    if (AO_STEP_ENABLED) {
+      rgb *= steps/(double)MARCH_MAX_STEPS;
+    } else if (AO_ENABLED) {
+      rgb += Color(0.5,0.5,0.5)*ambient_occlusion(sdf, follow(ray, depth), n);
+    }
   }
-  return rgb;
+  return clamp(rgb,0,1);//rgb;
 }
 
 

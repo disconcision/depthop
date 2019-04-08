@@ -25,7 +25,7 @@ R length (R3 x);
 R mod(R x, R y);
 R3 mod(R3 x, R3 y);
 R clamp(R x, R lo, R hi);
-//R3 clamp(R3 x, R lo, R hi);
+R3 clamp(R3 x, R lo, R hi);
 R2 sin (R2 x);
 R3 normalize(const R3& x);
 R mix(R x, R y, R a);

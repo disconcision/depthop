@@ -28,6 +28,19 @@ R3 follow(const Ray& ray, R depth) {
 }
 
 
+R smooth_step(R x) {
+    if (x <= 0) return 0.0;
+    if (x < 1) return ((6*x - 15)*x + 10)*x*x*x;
+    return 1.0;
+}
+
+R3 smooth_step(R3 x) {
+    return R3(smooth_step(x(0)),smooth_step(x(1)),smooth_step(x(2)));
+    //auto f = [](R x) -> R {return smooth_step(x);};
+    //return map(f, x);
+}
+
+
 template<typename F>
 auto map(F f, R2 x) -> R2 {
   return R2(f(x(0)), f(x(1)));};
@@ -50,25 +63,10 @@ R3 fract (const R3 x) { return map(fract_int, x);}
 //R3 fract (const R3 x) { return R3(fract(x(0)),fract(x(1)),fract(x(2)));}
 
 
-R smooth_step(R x) {
-  if (x <= 0) return 0.0;
-  if (x < 1) return ((6*x - 15)*x + 10)*x*x*x;
-  return 1.0;
-}
-
-
-R3 smooth_step(R3 x) {
-  return R3(smooth_step(x(0)),smooth_step(x(1)),smooth_step(x(2)));
-  //auto f = [](R x) -> R {return smooth_step(x);};
-  //return map(f, x);
-}
-
-
-
 R dot(R2 a, R2 b) { return a.dot(b); }
 R dot(R3 a, R3 b) { return a.dot(b); }
-R length (R2 x) { return x.norm(); }
-R length (R3 x) { return x.norm(); }
+R length(R2 x) { return x.norm(); }
+R length(R3 x) { return x.norm(); }
 R mod(R x, R y) { return x - y*floor(x/y); }
 R3 mod(R3 x, R3 y) { return R3(mod(x(0),y(0)),mod(x(1),y(1)),mod(x(2),y(2)));}
 R2 floor(R2 x) { return R2(floor(x(0)), floor(x(1))); }
@@ -79,15 +77,9 @@ R3 normalize(const R3& x) { return x.normalized(); }
 
 R mix(R x, R y, R a) { return (1 - a)*x + a*y; }
 R clamp(R x, R lo, R hi) { return min(hi, max(x, lo)); }
-R3 clamp(R3 x, R lo, R hi) {
-  return R3(
-          clamp(x(0), lo, hi),
-          clamp(x(1), lo, hi),
-          clamp(x(2), lo, hi));
-}
-
-
-
+R3 clamp(R3 x, R lo, R hi){
+    auto f = [lo, hi](R x){return clamp(x, lo, hi);};
+    return map(f, x);}
 
 // todo: refactor to change_basis
 R3x3 R3x3_from_3xR3 (R3 c0, R3 c1, R3 c2) {
@@ -95,10 +87,5 @@ R3x3 R3x3_from_3xR3 (R3 c0, R3 c1, R3 c2) {
   M << c0, c1, c2;
   return M;
 }
-
-// todo:
-// operator + on R2,R3,R4
-// operator * on R2,R3,R4
-
 
 

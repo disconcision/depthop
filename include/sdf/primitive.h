@@ -21,4 +21,7 @@ auto plane (R3 x) -> R;
 auto cylinder (R3 x) -> R;
 
 
+auto ellipsoid (const R3 d) -> SDF;
+
+
 #endif //RAYMARCHER_PRIMITIVES_H

@@ -17,6 +17,8 @@ auto round (R r, SDF f) -> SDF;
 /* uniformly scales sdf f by a factor of a */
 auto scale (R s, SDF f) -> SDF;
 
+auto scale_x (R s, SDF f) -> SDF;
+
 /* tile space with contents of f inside
  * the dxdxd cube centered at the origin */
 auto repeat (R3 d, SDF f) -> SDF;
@@ -25,7 +27,7 @@ auto repeat (R3 d, SDF f) -> SDF;
  * along the x-axis centered at the origin */
 auto repeat_x (R d, SDF f) -> SDF;
 
-/* todo: wtf do i do */
+/* todo: */
 auto circular_y (R a, SDF f) -> SDF;
 
 
