@@ -1,11 +1,15 @@
 
+CSC418 BONUS - andrew blinn - LEC0201
 
-For this assignment, I've implemented a CPU raymarcher ic C++, parallelized via openMP.
+For this assignment, I've implemented a CPU signed-distance-field raymarcher in C++, parallelized via openMP.
+
 
 This is pretty much my own code, but adapts the general design of the raytracing assignment as a guide, cribbing heavily in places, and I integrated the noise code from my shaders assignment. There are a lot of in-line references to the places where I learned about the various techniques I adapted. In particular, credit goes to Inigo Quilez and his amazing creative and expository work on raymarching:
  - https://iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm
 
-Note: I kind of got too ambitious with this one... the provided scene is very basic and illustrates only a portion of the implemented functionality. I'll stick to describing things here which are more-or-less visible in the provided image.
+Note: I kind of got too ambitious with this one... the provided scene is very basic and illustrates only a portion of the implemented functionality. I'll stick to describing things here which are more-or-less visible in the provided image. The included image constitutes my contest submission, but I've included a dump of test shots here, some of which more precisely illustrate various features:
+- https://imgur.com/a/CrhK6lD
+
 
 Briefly, raymarching is a technique where ray-geometry intersections are not calculated analytically, but via a 'marching' process whereby rays jump incrementally ('march') into the scene. The underlying geometry is implemented as a single function; a Signed Distance Function which takes as argument a point in space and returns the distance from that point to the nearest point on surface of the geometry. Each ray begins at the camera. We evaluate the SDF at that point, and then travel along the ray the returned distance, and then repeat the process until the distance becomes negative, indicating that we're now inside the geometry.
 
@@ -21,7 +25,6 @@ Features include:
 
 4. Constructive solid geometry, including subtraction, union, and smoothed union (you can see this where the columns meet the plain)
 
-5. Instancing via domain operations (the rings of columns and objects are single objects
-with domain distortions applied, see domain.cpp)
+5. Instancing via domain operations (the rings of columns and objects are single objects with domain distortions applied, see domain.cpp)
 
 6. All operations on SDFs are implemented as higher-order functions, enabling a composition/combinator-style programming approach. This was my personal innovation, which was a mistake since I've had trouble convincing the compiler to consistently inline lambdas... See everything in the SDF folder, which will appear pretty to functional programming partisans but probably revolting to everyone else. See field.cpp for the actual scene which is implemented with (a subsection of) those combinators.
