@@ -14,7 +14,7 @@ Briefly, raymarching is a technique where ray-geometry intersections are not cal
 The fact that all geometry is determined by a signed distance function opens up the opportunity to transform that function in interesting ways, obtaining a variety of visually intriguing effects very easily and relatively cheaply.
 
 
-![sample scene](screenshots/raymarcher4.jpg)
+![sample scene](screenshots/raymarcher4.png)
 
 Features include:
 
