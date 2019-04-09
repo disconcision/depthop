@@ -5,7 +5,9 @@
 Credits: There are a lot of in-line references to the places where I learned about the various techniques I adapted. In particular, credit goes to Inigo Quilez and his amazing creative and expository work on raymarching:
  - https://iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm
 
-![sample scene](screenshots/raymarcher1.jpg)
+<p align="center">
+  <img src="screenshots/raymarcher1.jpg"/>
+</p>
 
 Briefly, raymarching is a technique where ray-geometry intersections are not calculated analytically, but via a 'marching' process whereby rays jump incrementally ('march') into the scene. The underlying geometry is implemented as a single function; a Signed Distance Function which takes as argument a point in space and returns the distance from that point to the nearest point on surface of the geometry. Each ray begins at the camera. We evaluate the SDF at that point, and then travel along the ray the returned distance, and then repeat the process until the distance becomes negative, indicating that we're now inside the geometry.
 
