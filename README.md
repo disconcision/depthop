@@ -2,7 +2,7 @@
 
 ## 🚧 UNDER CONTRUCTION 👷
 
-# A signed distance field raymarcher in C++, implementing constructive solid geometry, soft shadows, ambient occlusion, blinn-phong shading, and perlin noise
+### A signed distance field raymarcher in C++, implementing constructive solid geometry, soft shadows, ambient occlusion, blinn-phong shading, and perlin noise
 
 <p align="center">
   <img src="screenshots/raymarcher1.jpg"/>
