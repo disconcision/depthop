@@ -12,22 +12,22 @@
 
 R field(R3 p) {
 
-  auto col_row =  move(R3(0,0,2),repeat_x(1,scale(0.1, cylinder)));
-  auto col_ring = circular_y(12,col_row);
+  SDF col_row =  move(R3(0,0,2), repeat_x(1, scale(0.1, cylinder)));
+  SDF col_ring = circular_y(12,col_row);
 
-  auto base_pipe = scale(0.6, cylinder);
-  auto pipes = join(
-          rotate_z(90*(M_PI/180), base_pipe),
-          join(base_pipe, rotate_x(90*(M_PI/180), base_pipe)));
+  SDF base_pipe = scale(0.6, cylinder);
+  SDF pipes = join(
+          rotate_z(M_PI/2, base_pipe),
+          join(base_pipe, rotate_x(M_PI/2, base_pipe)));
 
-  auto boi = rotate_y(20*(M_PI/180), subtract(sphere, pipes));
-  auto boi_row =  move(R3(0,0,2),repeat_x(1,scale(0.35, boi)));
-  auto boi_ring = move(R3(0,1.75,0), circular_y(12,boi_row));
+  SDF boi = rotate_y(M_PI/9, subtract(sphere, pipes));
+  SDF boi_row =  move(R3(0,0,2), repeat_x(1, scale(0.35, boi)));
+  SDF boi_ring = move(R3(0,1.75,0), circular_y(12, boi_row));
 
-  auto scene = join(boi_ring,
-          join(move(R3(0,0.7,0),boi),
-                  smooth_join(10, scale(0.6,col_ring),
-                      move(R3(0,-1,0),plane))));
+  SDF scene = join(boi_ring,
+                   join(move(R3(0,0.7,0), boi),
+                        smooth_join(10, scale(0.6, col_ring),
+                                        move(R3(0,-1,0), plane))));
 
   return scene(p);
 }
